@@ -1,135 +1,79 @@
 # Microrécif
 
-Simulation interactive d'un écosystème marin en 2D, développée en C++17 avec
-GTKmm 4 et Cairo. Les algues apparaissent et vieillissent, les coraux se nourrissent
-et se reproduisent, et les scavengers consomment les coraux morts.
+An interactive 2D marine ecosystem simulation built with C++17, GTKmm 4 and Cairo.
+Algae spawn and age, corals feed and reproduce, and scavengers consume dead corals.
 
-![Évolution du récif après 100 pas de simulation](docs/illustrations/recif.png)
+![Reef evolution after 100 simulation steps](docs/illustrations/recif.png)
 
-## Fonctionnalités
+## Features
 
-- Simulation en continu ou pas à pas.
-- Croissance et reproduction des coraux, avec détection des collisions.
-- Attribution des coraux morts aux scavengers les plus proches, avec un seul
-  scavenger par cible.
-- Activation de la naissance aléatoire des algues.
-- Chargement et sauvegarde de l'état du monde dans des fichiers texte.
-- Interface redimensionnable, compteurs de population et raccourcis clavier.
+- Continuous and step-by-step simulation.
+- Coral growth and reproduction with collision detection.
+- Assignment of dead corals to the nearest available scavengers, with one
+  scavenger per target.
+- Optional random algae generation.
+- Loading and saving the world state as plain text files.
+- Resizable interface, population counters and keyboard shortcuts.
 
-## Installation
+## Running the simulation
 
-Prérequis : un compilateur C++17, Make, pkg-config et GTKmm 4.
-Python 3 est nécessaire pour les tests.
-
-### macOS
-
-Installer les outils de développement Apple si nécessaire :
-
-```sh
-xcode-select --install
-```
-
-Installer les dépendances avec Homebrew :
-
-```sh
-brew install gtkmm4 pkg-config python
-```
-
-### Ubuntu / Debian
-
-```sh
-sudo apt install build-essential pkg-config libgtkmm-4.0-dev python3
-```
-
-## Lancement
-
-Depuis la racine du projet :
+From the project root:
 
 ```sh
 make
 make demo
 ```
 
-La démonstration démarre en pause. Cocher **Naissance d'algue**, puis cliquer sur
-**Start**. Les coraux vivants sont bleus, les coraux morts noirs, les algues vertes
-et les scavengers rouges. Un écosystème peut s'éteindre lorsque les organismes
-atteignent leur durée de vie maximale.
+The demo starts paused. Enable **Naissance d'algue** (algae generation), then click
+**Start**. Living corals are blue, dead corals are black, algae are green and
+scavengers are red. An ecosystem may die out as organisms reach their maximum
+lifespan.
 
-Pour ouvrir un autre monde ou démarrer avec une fenêtre vide :
+To load another world or start with an empty window:
 
 ```sh
 ./projet tests/t41.txt
 ./projet
 ```
 
-| Commande | Action | Raccourci |
+| Control | Action | Shortcut |
 | --- | --- | --- |
-| Start / Stop | Démarrer ou suspendre l'évolution | `s` |
-| Step | Avancer d'un pas lorsque la simulation est arrêtée | `1` |
-| Open | Charger un fichier de simulation | — |
-| Save | Sauvegarder l'état courant | — |
-| Exit | Fermer l'application | `q` |
+| Start / Stop | Run or pause the simulation | `s` |
+| Step | Advance one step while paused | `1` |
+| Open | Load a simulation file | — |
+| Save | Save the current state | — |
+| Exit | Close the application | `q` |
 
-Open et Save mettent la simulation en pause. Le délai entre deux pas est réglé
-par `speed_time_ms` dans `gui.cc` : 10 ms par défaut, soit environ 100 pas par
-seconde selon la charge de calcul. Après modification, relancer `make` et rouvrir
-l'application.
+Open and Save pause the simulation. The interval between steps is set by
+`speed_time_ms` in `gui.cc`: 10 ms by default, or approximately 100 steps per
+second depending on the workload. After changing this value, run `make` and
+restart the application.
 
-## Scénarios
+## Project structure
 
-| Fichier | Comportement à observer |
+| Files | Purpose |
 | --- | --- |
-| `examples/recif.txt` | Monde peuplé avec des coraux jeunes |
-| `tests/t36.txt` | Consommation d'une algue et croissance au deuxième pas |
-| `tests/t41.txt` | Naissance d'un corail, puis ajout d'un segment |
-| `tests/t42.txt` | Annulation d'une croissance contre le bord du monde |
-| `tests/t44.txt` | Alimentation et reproduction des scavengers |
+| `projet.cc` | Application entry point |
+| `gui.*` | GTK interface and simulation timer |
+| `simulation.*` | World updates, loading and saving |
+| `lifeform.*` | Algae, corals and scavengers |
+| `shape.*` | Geometry and collision detection |
+| `graphic.*`, `graphic_gui.h` | Cairo drawing primitives |
+| `constantes.h`, `message.*` | Model parameters and diagnostics |
+| `examples/` | Demo world |
+| `tests/` | Scenarios and automated tests |
+| `docs/` | Architecture, file format and illustrations |
 
-## Tests
+Additional documentation is available in French:
 
-```sh
-make test
-make test-sanitize
-```
+- [Architecture and model rules](docs/architecture.md)
+- [Simulation file format](docs/file-format.md)
+- [Test organization](tests/README.md)
 
-Les tests s'exécutent sans fenêtre ni dépendance GTK. Ils couvrent les 47 fichiers
-de référence, les 15 messages attendus, la géométrie, l'évolution des populations,
-l'attribution des cibles et la relecture des sauvegardes. Les scénarios valides
-sont également exécutés pendant 10, 100 et 2 000 pas avec naissance d'algues.
+## Authors
 
-`test-sanitize` utilise AddressSanitizer et UndefinedBehaviorSanitizer avec GCC
-ou Clang. La détection des fuites est désactivée pour cette cible.
+Antoine Bernadat and Timothy Biersohn.
 
-```sh
-make clean
-```
-
-Cette commande supprime l'exécutable principal et les fichiers objets. Les
-exécutables de tests et leurs symboles de débogage sont exclus de Git par
-`.gitignore`.
-
-## Organisation
-
-| Fichiers | Rôle |
-| --- | --- |
-| `projet.cc` | Point d'entrée |
-| `gui.*` | Interface GTK et temporisateur |
-| `simulation.*` | Évolution, chargement et sauvegarde |
-| `lifeform.*` | Algues, coraux et scavengers |
-| `shape.*` | Géométrie et collisions |
-| `graphic.*`, `graphic_gui.h` | Dessin Cairo |
-| `constantes.h`, `message.*` | Paramètres du modèle et diagnostics |
-| `examples/` | Monde de démonstration |
-| `tests/` | Scénarios et tests automatiques |
-| `docs/` | Architecture, format des fichiers et illustrations |
-
-- [Architecture et règles du modèle](docs/architecture.md)
-- [Format des fichiers de simulation](docs/file-format.md)
-- [Organisation des tests](tests/README.md)
-
-## Auteurs
-
-Antoine Bernadat et Timothy Biersohn.
-
-Projet de programmation orientée objet réalisé en BA2, puis enrichi d'une suite
-de tests et d'une attribution exclusive des cibles aux scavengers.
+Originally developed as a second-year undergraduate object-oriented programming
+project, then extended with automated tests and exclusive scavenger target
+assignment.
