@@ -1,0 +1,20 @@
+# Compilation
+*.o
+*.d
+*.dSYM/
+/projet
+/tests/runner/model
+/tests/runner/model-sanitize
+
+# Fichiers temporaires
+*.swp
+*~
+__pycache__/
+*.py[cod]
+/save_file
+/save_file.txt
+
+# Environnement local
+.DS_Store
+.vscode/
+.idea/
